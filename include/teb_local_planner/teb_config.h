@@ -429,16 +429,16 @@ public:
   boost::mutex& configMutex() {return config_mutex_;}
 
   /**
-   * Get xy tolerance taking into account the values provided by mbf in isGoalReached
+   * Get xy tolerance taking into account the values provided by MBF in isGoalReached
    *
-   * @return Current xy tolerance
+   * @return XY tolerance
    */
   double getXYGoalTolerance() const;
 
   /**
-   * Get yaw tolerance taking into account the values provided by mbf in isGoalReached
+   * Get yaw tolerance taking into account the values provided by MBF in isGoalReached
    *
-   * @return Current yaw tolerance
+   * @return Yaw tolerance
    */
   double getYawGoalTolerance() const;
 

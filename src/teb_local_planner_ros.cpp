@@ -478,20 +478,20 @@ bool TebLocalPlannerROS::isGoalReached(double xy_tolerance, double yaw_tolerance
 {
   boost::mutex::scoped_lock lock(cfg_.configMutex());
 
-  bool is_goal_reached = false;
+  // tolerances used to compute goal_reached_ in previous time step
+  const double prev_xy_goal_tolerance = cfg_.getXYGoalTolerance();
+  const double prev_yaw_goal_tolerance = cfg_.getYawGoalTolerance();
 
-  // goal_reached_ is computed in the previous time step
-  // so we can only trust its value if new tolerances are not stricter
-  if (xy_tolerance >= cfg_.goal_tolerance.mbf_xy_goal_tolerance &&
-      yaw_tolerance >= cfg_.goal_tolerance.mbf_yaw_goal_tolerance)
-  {
-    is_goal_reached = isGoalReached();
-  }
-
+  // update tolerances
   cfg_.goal_tolerance.mbf_xy_goal_tolerance = xy_tolerance;
   cfg_.goal_tolerance.mbf_yaw_goal_tolerance = yaw_tolerance;
 
-  return is_goal_reached;
+  // goal_reached_ is computed in the previous time step
+  // so we can only trust its value if new tolerances are not stricter
+  goal_reached_ &=
+      cfg_.getXYGoalTolerance() >= prev_xy_goal_tolerance && cfg_.getYawGoalTolerance() >= prev_yaw_goal_tolerance;
+
+  return isGoalReached();
 }
 
 
