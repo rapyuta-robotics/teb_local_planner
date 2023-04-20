@@ -382,6 +382,7 @@ uint32_t TebLocalPlannerROS::computeVelocityCommands(const geometry_msgs::PoseSt
     ++no_infeasible_plans_; // increase number of infeasible solutions in a row
     time_last_infeasible_plan_ = ros::Time::now();
     last_cmd_ = cmd_vel.twist;
+    message = "teb_local_planner trajectory has diverged";
     return mbf_msgs::ExePathResult::NO_VALID_CMD;
   }
          
