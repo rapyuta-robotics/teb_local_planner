@@ -126,7 +126,7 @@ void TebLocalPlannerROS::initialize(std::string name, tf2_ros::Buffer* tf, costm
     // init other variables
     tf_ = tf;
     costmap_ros_ = costmap_ros;
-    costmap_ = costmap_ros_->getCostmap(); // locking should be done in MoveBase.
+    costmap_ = costmap_ros_->getCostmap();
     
     costmap_model_ = boost::make_shared<base_local_planner::CostmapModel>(*costmap_);
 
@@ -341,8 +341,11 @@ uint32_t TebLocalPlannerROS::computeVelocityCommands(const geometry_msgs::PoseSt
     
   // clear currently existing obstacles
   obstacles_.clear();
-  
+
   // Update obstacle container with costmap information or polygons provided by a costmap_converter plugin
+  // Lock costmap mutex, as we check costs on updateObstacleContainerWithCostmap and isTrajectoryFeasible
+  boost::lock_guard<costmap_2d::Costmap2D::mutex_t> lg(*costmap_->getMutex());
+
   if (costmap_converter_)
     updateObstacleContainerWithCostmapConverter();
   else
@@ -503,7 +506,7 @@ void TebLocalPlannerROS::updateObstacleContainerWithCostmap()
   if (cfg_.obstacles.include_costmap_obstacles)
   {
     Eigen::Vector2d robot_orient = robot_pose_.orientationUnitVec();
-    
+
     for (unsigned int i=0; i<costmap_->getSizeInCellsX()-1; ++i)
     {
       for (unsigned int j=0; j<costmap_->getSizeInCellsY()-1; ++j)
